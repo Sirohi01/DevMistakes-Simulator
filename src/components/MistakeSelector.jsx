@@ -8,7 +8,13 @@ import {
 import { motion } from 'framer-motion';
 
 const MistakeSelector = ({ mistakes, selectedId, onSelect }) => {
+    const [searchQuery, setSearchQuery] = useState('');
     const categories = Object.keys(CATEGORIES);
+
+    const filteredMistakes = mistakes.filter(m =>
+        m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const CategoryIcon = ({ name }) => {
         const icons = {
@@ -42,6 +48,29 @@ const MistakeSelector = ({ mistakes, selectedId, onSelect }) => {
             gap: '1rem'
         }} className="selector-aside custom-scrollbar">
 
+            {/* Search Bar */}
+            <div style={{ margin: '0 1rem', position: 'relative' }}>
+                <input
+                    type="text"
+                    placeholder="Search mistakes..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '12px',
+                        color: 'white',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        transition: 'all 0.2s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--accent-primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
+                />
+            </div>
+
             {/* Mastery HUD */}
             <div className="glass" style={{ margin: '0 1rem 1rem 1rem', padding: '1.25rem', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
@@ -55,37 +84,42 @@ const MistakeSelector = ({ mistakes, selectedId, onSelect }) => {
             </div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                {categories.map(cat => (
-                    <div key={cat} style={{ marginBottom: '1.5rem' }}>
-                        <CategoryBadge name={cat} />
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            {mistakes.filter(m => m.category === CATEGORIES[cat]).map(mistake => (
-                                <button
-                                    key={mistake.id}
-                                    onClick={() => onSelect(mistake.id)}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px',
-                                        width: '100%', textAlign: 'left', border: 'none', background: 'transparent',
-                                        color: selectedId === mistake.id ? 'var(--text-main)' : 'var(--text-muted)',
-                                        fontSize: '0.9rem', cursor: 'pointer', borderRadius: '10px', transition: 'all 0.2s ease',
-                                        position: 'relative', overflow: 'hidden'
-                                    }}
-                                    className={selectedId === mistake.id ? 'selected-mistake' : 'mistake-item'}
-                                >
-                                    {selectedId === mistake.id && (
-                                        <motion.div layoutId="bg" className="glass" style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }} />
-                                    )}
-                                    <div style={{
-                                        width: '6px', height: '6px', borderRadius: '50%',
-                                        background: selectedId === mistake.id ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)'
-                                    }} />
-                                    <span style={{ flex: 1, fontWeight: selectedId === mistake.id ? 700 : 500 }}>{mistake.title}</span>
-                                    {selectedId === mistake.id && <ChevronRight size={14} className="text-accent" />}
-                                </button>
-                            ))}
+                {categories.map(cat => {
+                    const catMistakes = filteredMistakes.filter(m => m.category === CATEGORIES[cat]);
+                    if (catMistakes.length === 0) return null;
+
+                    return (
+                        <div key={cat} style={{ marginBottom: '1.5rem' }}>
+                            <CategoryBadge name={cat} />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {catMistakes.map(mistake => (
+                                    <button
+                                        key={mistake.id}
+                                        onClick={() => onSelect(mistake.id)}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px',
+                                            width: '100%', textAlign: 'left', border: 'none', background: 'transparent',
+                                            color: selectedId === mistake.id ? 'var(--text-main)' : 'var(--text-muted)',
+                                            fontSize: '0.9rem', cursor: 'pointer', borderRadius: '10px', transition: 'all 0.2s ease',
+                                            position: 'relative', overflow: 'hidden'
+                                        }}
+                                        className={selectedId === mistake.id ? 'selected-mistake' : 'mistake-item'}
+                                    >
+                                        {selectedId === mistake.id && (
+                                            <motion.div layoutId="bg" className="glass" style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }} />
+                                        )}
+                                        <div style={{
+                                            width: '6px', height: '6px', borderRadius: '50%',
+                                            background: selectedId === mistake.id ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)'
+                                        }} />
+                                        <span style={{ flex: 1, fontWeight: selectedId === mistake.id ? 700 : 500 }}>{mistake.title}</span>
+                                        {selectedId === mistake.id && <ChevronRight size={14} className="text-accent" />}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </motion.div>
 
             <style>{`

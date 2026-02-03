@@ -42,7 +42,7 @@ const SimulatorLayout = ({ mistake, isFixed, toggleFix, viewMode }) => {
                     <MessageSquare size={14} className="text-accent" />
                     <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>AI Peer Review</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                <div className="reviews-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                     {reviews.map((rev, i) => (
                         <div key={i} className="glass" style={{ padding: '1rem', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
@@ -59,15 +59,14 @@ const SimulatorLayout = ({ mistake, isFixed, toggleFix, viewMode }) => {
 
     return (
         <div className="simulator-layout">
-            {/* Header with Ship Logic */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+            <div className="simulator-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
                         <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.12em', background: 'rgba(99, 102, 241, 0.1)', padding: '4px 10px', borderRadius: '6px' }}>
                             {mistake.category}
                         </span>
                     </div>
-                    <h2 style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--text-main)' }}>{mistake.title}</h2>
+                    <h2 className="responsive-h2" style={{ fontSize: '2.25rem', fontWeight: 900, color: 'var(--text-main)' }}>{mistake.title}</h2>
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
@@ -180,10 +179,10 @@ const SimulatorLayout = ({ mistake, isFixed, toggleFix, viewMode }) => {
             </div>
 
             {/* Bottom God-Tier Panels */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: '2rem', marginTop: '2.5rem' }}>
+            <div className="bottom-panels" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: '2rem', marginTop: '2.5rem' }}>
                 <AIPeerReview />
 
-                <div>
+                <div className="terminal-panel">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                         <TerminalIcon size={14} className="text-accent" />
                         <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Debug Terminal</span>
@@ -193,7 +192,7 @@ const SimulatorLayout = ({ mistake, isFixed, toggleFix, viewMode }) => {
                         overflowY: 'auto', border: '1px solid #111', fontFamily: 'var(--font-mono)', fontSize: '0.75rem'
                     }} className="custom-scrollbar">
                         {terminalLogs.map((log, i) => (
-                            <div key={i} style={{ color: log.includes('WARN') ? '#fbbf24' : '#10b981', marginBottom: '6px', whiteSpace: 'nowrap' }}>
+                            <div key={i} style={{ color: log.includes('WARN') ? '#fbbf24' : '#10b981', marginBottom: '6px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                                 <span style={{ opacity: 0.4 }}>$</span> {log}
                             </div>
                         ))}
@@ -206,6 +205,13 @@ const SimulatorLayout = ({ mistake, isFixed, toggleFix, viewMode }) => {
                 __html: `
                 @keyframes blink { 50% { opacity: 0; } }
                 .text-accent { color: var(--accent-primary); }
+                @media (max-width: 1024px) {
+                    .bottom-panels { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+                    .responsive-h2 { font-size: 1.75rem !important; }
+                }
+                @media (max-width: 600px) {
+                    .reviews-grid { grid-template-columns: 1fr !important; }
+                }
             `}} />
         </div>
     );

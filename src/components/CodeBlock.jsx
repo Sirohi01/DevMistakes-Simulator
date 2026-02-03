@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import Prism from 'prismjs';
+import 'prismjs/themes/prism-tomorrow.css';
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-css';
 
 const CodeBlock = ({ code, label, type = 'broken' }) => {
     const isError = type === 'broken';
+
+    useEffect(() => {
+        Prism.highlightAll();
+    }, [code]);
 
     return (
         <div style={{
@@ -27,18 +35,21 @@ const CodeBlock = ({ code, label, type = 'broken' }) => {
                 <span>{label}</span>
                 <span>{isError ? '❌' : '✅'}</span>
             </div>
-            <pre style={{
+            <pre className="line-numbers" style={{
                 padding: '16px',
                 margin: 0,
                 fontSize: '0.85rem',
                 lineHeight: '1.5',
                 overflowX: 'auto',
-                color: '#d1d5db'
+                background: 'transparent'
             }}>
-                <code>{code.trim()}</code>
+                <code className={`language-jsx`}>
+                    {code.trim()}
+                </code>
             </pre>
         </div>
     );
 };
 
 export default CodeBlock;
+

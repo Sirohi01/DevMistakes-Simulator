@@ -7,21 +7,86 @@
   --radius-xl: 24px;
   --radius-2xl: 32px;
 
+  /* Default Midnight Theme */
   --bg-page: #05060f;
   --bg-card: rgba(13, 14, 28, 0.7);
   --bg-hover: rgba(255, 255, 255, 0.03);
-
   --text-main: #ffffff;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
-
   --border-color: rgba(255, 255, 255, 0.08);
   --accent-primary: #6366f1;
   --accent-secondary: #a855f7;
   --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-
   --color-success: #22c55e;
   --color-error: #ef4444;
+  --transition-speed: 0.3s;
+
+  /* Responsive Spacing Vars */
+  --main-padding: 2rem;
+  --sidebar-width: 320px;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --main-padding: 1.5rem;
+    --sidebar-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --main-padding: 1rem;
+    --sidebar-width: 100%;
+  }
+}
+
+/* Cyberpunk Theme */
+[data-theme='cyberpunk'] {
+  --bg-page: #0d0221;
+  --bg-card: rgba(15, 0, 31, 0.8);
+  --bg-hover: rgba(255, 0, 255, 0.05);
+  --text-main: #00ffcc;
+  --text-muted: #ff00ff;
+  --text-dim: #7d00ff;
+  --border-color: #ff00ff;
+  --accent-primary: #ff00ff;
+  --accent-secondary: #00ffcc;
+  --accent-gradient: linear-gradient(135deg, #ff00ff 0%, #00ffcc 100%);
+  --color-success: #00ff00;
+  --color-error: #ff003c;
+}
+
+/* Dracula Hacker Theme */
+[data-theme='dracula'] {
+  --bg-page: #282a36;
+  --bg-card: #44475a;
+  --bg-hover: rgba(255, 121, 198, 0.1);
+  --text-main: #f8f8f2;
+  --text-muted: #bd93f9;
+  --text-dim: #6272a4;
+  --border-color: var(--text-dim);
+  --accent-primary: #ff79c6;
+  --accent-secondary: #50fa7b;
+  --accent-gradient: linear-gradient(135deg, #bd93f9 0%, #50fa7b 100%);
+  --color-success: #50fa7b;
+  --color-error: #ff5555;
+}
+
+/* Solarized Modern Theme */
+[data-theme='solarized'] {
+  --bg-page: #002b36;
+  --bg-card: rgba(7, 54, 66, 0.9);
+  --bg-hover: rgba(147, 161, 161, 0.05);
+  --text-main: #93a1a1;
+  --text-muted: #839496;
+  --text-dim: #586e75;
+  --border-color: #073642;
+  --accent-primary: #268bd2;
+  --accent-secondary: #859900;
+  --accent-gradient: linear-gradient(135deg, #268bd2 0%, #859900 100%);
+  --color-success: #859900;
+  --color-error: #dc322f;
 }
 
 * {
@@ -102,6 +167,7 @@ body {
 .text-gradient {
   background: var(--accent-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

@@ -2,109 +2,140 @@ import React, { useState } from 'react';
 import { Search, ShieldAlert, CheckCircle, Sparkles, Award, Zap, AlertTriangle, TrendingUp, Cpu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const CodeAnalyzer = () => {
+const CodeAnalyzer = ({ onAddXp }) => {
     const [code, setCode] = useState('');
     const [results, setResults] = useState(null);
     const [isScanning, setIsScanning] = useState(false);
     const [score, setScore] = useState(100);
+    const [roastMode, setRoastMode] = useState(false);
+
+    const ROASTS = [
+        "Bhai ye code likha hai ya chidiya ki tang? Safari me crash ho jayega.",
+        "React Fiber dekh ke ro raha hoga tumhare code ko.",
+        "Senior dev se ye code review mat karwana, resume wapas de dega.",
+        "Key={index}? Seriously? 2015 me ji rahe ho kya?",
+        "Z-index: 999999? CSS specificity ki maut hai ye.",
+        "Clean code book padho bhai, bahut zarurat hai.",
+        "ChatGPT se likhwaya hai na? Sach batana."
+    ];
 
     const analyzeCode = () => {
         setIsScanning(true);
         setResults(null);
+        if (onAddXp) onAddXp(50); // XP for using the auditor
 
         setTimeout(() => {
             const foundIssues = [];
             let currentScore = 100;
+            const lines = code.split('\n');
 
-            // 1. React Architecture & Hooks
-            if (code.includes('map(') && !code.includes('key=')) {
-                foundIssues.push({
-                    type: 'error',
-                    title: 'CRITICAL: Broken Reconciliation',
-                    message: 'Missing map keys will lead to massive re-render overhead and state corruption.',
-                    fix: 'items.map(item => <div key={item.id}>...</div>)',
-                    impact: 'High'
-                });
-                currentScore -= 40;
-            }
+            // --- 1. Line-by-Line Structural Analysis ---
+            let openParens = 0;
+            let openBrackets = 0;
+            let openCurlys = 0;
+            let openJSXTags = [];
 
-            if (/if\s*\(.*\)\s*\{.*\s*(useEffect|useState|useContext|useReducer)/s.test(code)) {
-                foundIssues.push({
-                    type: 'error',
-                    title: 'CRITICAL: Conditional Hook Call',
-                    message: 'Breaking the Rule of Hooks! This will crash your application on re-renders.',
-                    fix: 'Move the hook call outside the conditional logic.',
-                    impact: 'High'
-                });
-                currentScore -= 50;
-            }
+            lines.forEach((line, index) => {
+                const lineNum = index + 1;
+                const trimmed = line.trim();
+                if (!trimmed) return;
 
-            if (code.includes('setState') && code.includes('++')) {
-                foundIssues.push({
-                    type: 'error',
-                    title: 'Direct State Mutation',
-                    message: 'Never mutate state directly. Use the functional update pattern prev => prev + 1.',
-                    fix: 'setCount(prev => prev + 1)',
-                    impact: 'Medium'
-                });
+                // Check for unclosed strings
+                const quotes = (line.match(/"/g) || []).length + (line.match(/'/g) || []).length;
+                if (quotes % 2 !== 0 && !trimmed.endsWith('\\') && !trimmed.includes('`')) {
+                    foundIssues.push({
+                        type: 'error',
+                        title: `L- ${lineNum}: Unclosed String Literal`,
+                        message: 'Missing a closing double or single quote on this line.',
+                        fix: 'Check your string declarations.',
+                        impact: 'High'
+                    });
+                    currentScore -= 10;
+                }
+
+                // Balance tracking
+                openParens += (line.match(/\(/g) || []).length - (line.match(/\)/g) || []).length;
+                openBrackets += (line.match(/\[/g) || []).length - (line.match(/\]/g) || []).length;
+                openCurlys += (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+
+                // JSX Tag Matching (Improved for broken tags)
+                const openTagMatch = line.match(/<([a-zA-Z0-9]+)(?![^>]*\/>)/g);
+                const closeTagMatch = line.match(/<\/([a-zA-Z0-9]*)/g);
+
+                if (openTagMatch) {
+                    openTagMatch.forEach(tag => {
+                        const name = tag.slice(1);
+                        if (!['img', 'br', 'hr', 'input'].includes(name.toLowerCase())) {
+                            openJSXTags.push({ name, line: lineNum });
+                        }
+                    });
+                }
+
+                if (closeTagMatch) {
+                    closeTagMatch.forEach(tag => {
+                        const name = tag.slice(2);
+                        if (openJSXTags.length > 0) {
+                            const lastTag = openJSXTags[openJSXTags.length - 1].name;
+                            if (lastTag === name || name === '') { // handle </li vs </li>
+                                openJSXTags.pop();
+                            } else {
+                                foundIssues.push({
+                                    type: 'error',
+                                    title: `L- ${lineNum}: Mismatched JSX Tag`,
+                                    message: `Closing tag </${name}> doesn't match open tag <${lastTag}>.`,
+                                    fix: `Correct the tag structure at line ${lineNum}.`,
+                                    impact: 'High'
+                                });
+                                currentScore -= 15;
+                            }
+                        }
+                    });
+                }
+
+                // Extra check for unclosed tag without '>'
+                if (trimmed.includes('</') && !trimmed.includes('>')) {
+                    foundIssues.push({
+                        type: 'error',
+                        title: `L- ${lineNum}: Syntax - Broken Tag`,
+                        message: 'Closing tag is missing the closing ">".',
+                        fix: 'Ensure tags end with >.',
+                        impact: 'High'
+                    });
+                    currentScore -= 10;
+                }
+            });
+
+            // Global Structural Errors
+            if (openParens !== 0) {
+                foundIssues.push({ type: 'error', title: 'Global: Unbalanced Parentheses', message: `Found ${Math.abs(openParens)} unclosed parenthesis.`, fix: 'Check all ( ) pairs.', impact: 'High' });
                 currentScore -= 20;
             }
-
-            // 2. Performance Audits
-            if (code.includes('filter(') && !code.includes('useMemo')) {
-                foundIssues.push({
-                    type: 'warning',
-                    title: 'Performance: Unclaimed Memo',
-                    message: 'Heavy data filtering detected without useMemo. This will slow down every render cycle.',
-                    fix: 'const filtered = useMemo(() => list.filter(...), [list])',
-                    impact: 'Medium'
-                });
-                currentScore -= 15;
+            if (openCurlys !== 0) {
+                foundIssues.push({ type: 'error', title: 'Global: Unbalanced Braces', message: `Found ${Math.abs(openCurlys)} unclosed curly braces.`, fix: 'Check all { } pairs.', impact: 'High' });
+                currentScore -= 25;
             }
-
-            if (code.includes('dangerouslySetInnerHTML')) {
-                foundIssues.push({
-                    type: 'warning',
-                    title: 'Security: XSS Vulnerability',
-                    message: 'Direct HTML injection can lead to Cross-Site Scripting (XSS) attacks.',
-                    fix: 'Use a library like DOMPurify before rendering HTML string.',
-                    impact: 'High'
-                });
+            if (openJSXTags.length > 0) {
+                const tags = openJSXTags.map(t => t.name).join(', ');
+                foundIssues.push({ type: 'error', title: 'Global: Unclosed JSX Tags', message: `Tags [${tags}] were never closed.`, fix: 'Ensure every opening tag has a corresponding closing tag.', impact: 'High' });
                 currentScore -= 30;
             }
 
-            // 3. CSS Logic & A11y
-            if (code.includes('z-index') && !code.includes('position')) {
-                foundIssues.push({
-                    type: 'error',
-                    title: 'CSS Logic: Z-index Failure',
-                    message: 'z-index property has no effect on static elements. Requires relative/absolute.',
-                    fix: 'Add position: relative; to this element.',
-                    impact: 'Low'
-                });
-                currentScore -= 10;
+            // --- 2. Advanced React Performance Audits ---
+            const cleanCode = code.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+            if (cleanCode.includes('.map(') && !cleanCode.includes('key={')) {
+                foundIssues.push({ type: 'error', title: 'Performance: Missing Map Key', message: 'Reconciliation will be broken without unique keys.', fix: '.map(i => <div key={i.id}>)', impact: 'High' });
+                currentScore -= 40;
             }
 
-            if (code.includes('!important')) {
-                foundIssues.push({
+            if (roastMode && foundIssues.length > 0) {
+                const randomRoast = ROASTS[Math.floor(Math.random() * ROASTS.length)];
+                foundIssues.unshift({
                     type: 'warning',
-                    title: 'Architecture: Specificity Hack',
-                    message: 'Using "!important" is a sign of poor selector architecture.',
-                    fix: 'Use more specific BEM classes or ID selectors.',
-                    impact: 'Low'
+                    title: '🔥 CODE ROAST (AI Sarcasm)',
+                    message: randomRoast,
+                    fix: 'Write better code next time.',
+                    impact: 'Emotional Damage'
                 });
-                currentScore -= 10;
-            }
-
-            if (code.includes('<img') && !code.includes('alt=')) {
-                foundIssues.push({
-                    type: 'error',
-                    title: 'A11y: Missing Alt Text',
-                    message: 'Accessibility violation! Screen readers won\'t know what this image is.',
-                    fix: '<img src="..." alt="Description" />',
-                    impact: 'Medium'
-                });
-                currentScore -= 20;
             }
 
             setScore(Math.max(0, currentScore));
@@ -112,6 +143,7 @@ const CodeAnalyzer = () => {
             setIsScanning(false);
         }, 1200);
     };
+
 
     const getScoreGrade = () => {
         if (score >= 90) return { grade: 'A+', color: 'var(--color-success)', text: 'Production Ready' };
@@ -123,9 +155,9 @@ const CodeAnalyzer = () => {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            style={{ padding: '0 2rem 4rem 2rem', maxWidth: '1400px', margin: '0 auto' }}
+            style={{ padding: '0 var(--main-padding) 4rem', maxWidth: '1400px', margin: '0 auto' }}
         >
-            <div style={{ marginBottom: '3rem' }}>
+            <div className="analyzer-header" style={{ marginBottom: '3rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-primary)', marginBottom: '1rem' }}>
                     <Cpu size={20} />
                     <span style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Deep Scanning Engine v3</span>
@@ -141,11 +173,7 @@ const CodeAnalyzer = () => {
                 </p>
             </div>
 
-            <div className="analyzer-grid" style={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1fr) 450px',
-                gap: '2.5rem'
-            }}>
+            <div className="analyzer-grid">
                 {/* 📝 INPUT SECTION */}
                 <div className="glass" style={{ borderRadius: 'var(--radius-2xl)', overflow: 'hidden', display: 'flex', flexDirection: 'column', border: '1px solid var(--border-color)' }}>
                     <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -161,6 +189,7 @@ const CodeAnalyzer = () => {
                         >Clear Input</button>
                     </div>
                     <textarea
+                        className="analyzer-input-area"
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
                         placeholder="Paste your code snippet here to start the audit..."
@@ -249,7 +278,21 @@ const CodeAnalyzer = () => {
                         </p>
                     </motion.div>
 
-                    <h3 style={{ fontSize: '1rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '1rem' }}>Audit Findings</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                        <h3 style={{ fontSize: '1rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Audit Findings</h3>
+                        <button
+                            onClick={() => setRoastMode(!roastMode)}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px',
+                                borderRadius: '8px', border: roastMode ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                                background: roastMode ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
+                                color: roastMode ? 'var(--accent-primary)' : 'var(--text-dim)',
+                                fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s'
+                            }}
+                        >
+                            {roastMode ? '🔥 ROAST ON' : '💬 NORMAL MODE'}
+                        </button>
+                    </div>
                     <AnimatePresence mode="wait">
                         {isScanning ? (
                             <motion.div
@@ -327,8 +370,17 @@ const CodeAnalyzer = () => {
             <style>{`
                 @keyframes spin { to { transform: rotate(360deg); } }
                 .text-accent { color: var(--accent-primary); }
+                .analyzer-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) 450px;
+                    gap: 2.5rem;
+                }
                 @media (max-width: 1200px) {
-                    .analyzer-grid { grid-template-columns: 1fr !important; }
+                    .analyzer-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+                }
+                @media (max-width: 768px) {
+                    .analyzer-header h2 { font-size: 1.75rem !important; }
+                    .analyzer-input-area { min-height: 400px !important; }
                 }
             `}</style>
         </motion.div>

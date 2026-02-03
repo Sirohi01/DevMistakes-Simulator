@@ -39,14 +39,14 @@ const LivePlayground = ({ mistake }) => {
     };
 
     return (
-        <div className="animate-slide-up" style={{ padding: '1rem', maxWidth: '1280px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
+        <div className="animate-slide-up" style={{ padding: '0 var(--main-padding) 4rem', maxWidth: '1280px', margin: '0 auto' }}>
+            <div className="playground-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1.5rem' }}>
                 <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-primary)', marginBottom: '0.5rem' }}>
                         <TerminalIcon size={14} />
                         <span style={{ fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Unified Lab Environment</span>
                     </div>
-                    <h2 style={{ fontSize: '2.5rem', fontWeight: 900 }}>Standardized Playground</h2>
+                    <h2 className="responsive-h2" style={{ fontSize: '2.5rem', fontWeight: 900 }}>Standardized Playground</h2>
                 </div>
 
                 <div className="glass" style={{ display: 'flex', padding: '4px', borderRadius: '12px', background: 'rgba(0,0,0,0.2)' }}>
@@ -68,7 +68,7 @@ const LivePlayground = ({ mistake }) => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '2.5rem' }}>
+            <div className="playground-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 350px', gap: '2.5rem' }}>
                 <div className="glass" style={{ borderRadius: '24px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
                     <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', gap: '8px' }}>
@@ -166,6 +166,11 @@ const LivePlayground = ({ mistake }) => {
             <style>{`
                 @keyframes spin { to { transform: rotate(360deg); } }
                 .text-accent { color: var(--accent-primary); }
+                @media (max-width: 1100px) {
+                    .playground-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+                    .responsive-h2 { font-size: 1.75rem !important; }
+                    .playground-header { flex-direction: column; align-items: flex-start !important; }
+                }
             `}</style>
         </div>
     );

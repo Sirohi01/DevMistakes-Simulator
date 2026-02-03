@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, ShieldAlert, Zap, Award, Target, Trophy, ArrowRight, RotateCcw } from 'lucide-react';
 
-const ChallengeMode = ({ mistakes, onComplete }) => {
+const ChallengeMode = ({ mistakes, onComplete, onAddXp }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [isCorrect, setIsCorrect] = useState(null);
@@ -34,12 +34,14 @@ const ChallengeMode = ({ mistakes, onComplete }) => {
         setIsCorrect(correct);
         if (correct) {
             setScore(s => s + 100);
+            if (onAddXp) onAddXp(20); // Small bonus per correct answer
         }
     };
 
     const nextQuestion = () => {
         if (currentStep >= 4) {
             setGameStatus('finished');
+            if (onAddXp) onAddXp(100); // Big bonus for finishing
         } else {
             setCurrentStep(s => s + 1);
         }
@@ -50,26 +52,53 @@ const ChallengeMode = ({ mistakes, onComplete }) => {
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="glass"
-                style={{ padding: '4rem', textAlign: 'center', maxWidth: '600px', margin: '4rem auto', borderRadius: '24px' }}
+                style={{ position: 'relative', overflow: 'hidden' }}
             >
-                <Trophy size={80} color="var(--accent-primary)" style={{ marginBottom: '2rem' }} />
-                <h2 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '1rem' }}>Challenge Complete!</h2>
-                <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>Final Score: <span style={{ color: 'var(--accent-primary)', fontWeight: 800 }}>{score}</span></p>
-                <div style={{ marginTop: '3rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                    <button
-                        onClick={() => { setGameStatus('playing'); setCurrentStep(0); setScore(0); }}
-                        style={{ padding: '12px 24px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 700 }}
-                    >
-                        Try Again
-                    </button>
-                    <button
-                        onClick={() => window.location.reload()}
-                        style={{ padding: '12px 24px', borderRadius: '12px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'white' }}
-                    >
-                        Share Score
-                    </button>
+                {/* Simple CSS Confetti */}
+                <div className="confetti-container">
+                    {[...Array(20)].map((_, i) => (
+                        <div key={i} className="confetti-piece" style={{
+                            left: `${Math.random() * 100}%`,
+                            animationDelay: `${Math.random() * 3}s`,
+                            backgroundColor: ['#6366f1', '#a855f7', '#22c55e', '#ef4444'][Math.floor(Math.random() * 4)]
+                        }} />
+                    ))}
                 </div>
+
+                <div className="glass" style={{ padding: '4rem', textAlign: 'center', maxWidth: '600px', margin: '4rem auto', borderRadius: '24px', position: 'relative', zIndex: 1 }}>
+                    <Trophy size={80} color="var(--accent-primary)" style={{ marginBottom: '2rem' }} />
+                    <h2 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '1rem' }}>Challenge Complete!</h2>
+                    <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)' }}>Final Score: <span style={{ color: 'var(--accent-primary)', fontWeight: 800 }}>{score}</span></p>
+                    <div style={{ marginTop: '3rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button
+                            onClick={() => { setGameStatus('playing'); setCurrentStep(0); setScore(0); }}
+                            style={{ padding: '12px 24px', borderRadius: '12px', background: 'var(--accent-gradient)', color: 'white', fontWeight: 700 }}
+                        >
+                            Try Again
+                        </button>
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(`I just scored ${score} points on DevMistakes Simulator! Can you beat me?`);
+                                alert('Challenge results copied to clipboard!');
+                            }}
+                            style={{ padding: '12px 24px', borderRadius: '12px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'white' }}
+                        >
+                            Share Score
+                        </button>
+                    </div>
+                </div>
+
+                <style>{`
+                    .confetti-container { position: absolute; inset: 0; pointer-events: none; }
+                    .confetti-piece {
+                        position: absolute; width: 10px; height: 10px; top: -10px;
+                        opacity: 0; animation: fall 3s linear infinite;
+                    }
+                    @keyframes fall {
+                        0% { transform: translateY(0) rotate(0); opacity: 1; }
+                        100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+                    }
+                `}</style>
             </motion.div>
         );
     }
@@ -87,7 +116,7 @@ const ChallengeMode = ({ mistakes, onComplete }) => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem' }}>
+            <div className="challenge-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem' }}>
                 <div className="glass" style={{ padding: '2rem', borderRadius: '24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-error)', marginBottom: '1rem' }}>
                         <ShieldAlert size={18} />
@@ -173,6 +202,11 @@ const ChallengeMode = ({ mistakes, onComplete }) => {
                     </AnimatePresence>
                 </div>
             </div>
+            <style>{`
+                @media (max-width: 900px) {
+                    .challenge-grid { grid-template-columns: 1fr !important; }
+                }
+            `}</style>
         </div>
     );
 };

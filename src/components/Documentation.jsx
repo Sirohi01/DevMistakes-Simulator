@@ -66,7 +66,7 @@ const Documentation = () => {
                         <div style={{ background: 'var(--accent-gradient)', padding: '12px', borderRadius: '16px' }}>
                             <Cpu color="white" size={28} />
                         </div>
-                        <h3 style={{ fontSize: '2.25rem', fontWeight: 800 }}>01. Simulation Philosophy</h3>
+                        <h3 className="docs-section-title" style={{ fontSize: '2.25rem', fontWeight: 800 }}>01. Simulation Philosophy</h3>
                     </div>
                     <div className="glass" style={{ padding: '3rem', borderRadius: 'var(--radius-2xl)', border: '1px solid rgba(255,255,255,0.05)' }}>
                         <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--text-muted)', marginBottom: '2rem' }}>
@@ -96,7 +96,7 @@ const Documentation = () => {
                         <div style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #2dd4bf 100%)', padding: '12px', borderRadius: '16px' }}>
                             <Code color="white" size={28} />
                         </div>
-                        <h3 style={{ fontSize: '2.25rem', fontWeight: 800 }}>02. React Pitfalls & Antipatterns</h3>
+                        <h3 className="docs-section-title" style={{ fontSize: '2.25rem', fontWeight: 800 }}>02. React Pitfalls & Antipatterns</h3>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
                         {[
@@ -118,14 +118,14 @@ const Documentation = () => {
                         <div style={{ background: 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)', padding: '12px', borderRadius: '16px' }}>
                             <Layers color="white" size={28} />
                         </div>
-                        <h3 style={{ fontSize: '2.25rem', fontWeight: 800 }}>03. Scalable CSS Principles</h3>
+                        <h3 className="docs-section-title" style={{ fontSize: '2.25rem', fontWeight: 800 }}>03. Scalable CSS Principles</h3>
                     </div>
                     <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Writing CSS that doesn't break at 2 AM requires more than just knowing properties; it requires understanding <strong>The Box Model</strong> and <strong>Stacking Contexts</strong>.</p>
                     <div className="glass" style={{ overflow: 'hidden', borderRadius: 'var(--radius-2xl)' }}>
                         <div style={{ padding: '2rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.02)' }}>
                             <h4 style={{ fontSize: '1.25rem' }}>The Golden Rules of Layout</h4>
                         </div>
-                        <div style={{ padding: '2.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
+                        <div className="rules-grid" style={{ padding: '2.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
                             <ul style={{ listStyle: 'none', display: 'grid', gap: '1rem' }}>
                                 <li style={{ display: 'flex', gap: '12px' }}><CheckCircle className="text-success" size={20} /> Use Clamp() for Fluid Typography</li>
                                 <li style={{ display: 'flex', gap: '12px' }}><CheckCircle className="text-success" size={20} /> Prefer Flex Gap over Margins</li>
@@ -149,11 +149,12 @@ const Documentation = () => {
         .text-secondary { color: var(--accent-secondary); }
         .text-success { color: var(--color-success); }
         .text-error { color: var(--color-error); }
-        @media (max-width: 768px) {
-            .docs-container { padding: 1.5rem !important; }
-            h2 { fontSize: 2.25rem !important; }
-        }
-      `}</style>
+                @media (max-width: 768px) {
+                    .docs-container { padding: 0 var(--main-padding) 4rem !important; }
+                    .docs-section-title { font-size: 1.75rem !important; }
+                    .rules-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+                }
+            `}</style>
         </motion.div>
     );
 };

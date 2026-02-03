@@ -23,18 +23,18 @@ const ExplanationPanel = ({ mistake }) => {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass"
+            className="glass explanation-container"
             style={{ borderRadius: '30px', padding: '2.5rem', marginTop: '2.5rem', border: '1px solid var(--border-color)', position: 'relative', overflow: 'hidden' }}
         >
             {/* Background Glow */}
             <div style={{ position: 'absolute', top: '-10%', right: '-10%', width: '300px', height: '300px', background: 'var(--accent-gradient)', opacity: 0.03, filter: 'blur(100px)', zIndex: 0 }} />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '3rem', position: 'relative', zIndex: 1 }}>
+            <div className="explanation-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '3rem', position: 'relative', zIndex: 1 }}>
 
                 {/* Main Content */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                    <div className="audit-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                         <section>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#ff6b6b', marginBottom: '1rem' }}>
                                 <ShieldAlert size={20} />
@@ -62,7 +62,7 @@ const ExplanationPanel = ({ mistake }) => {
                 </div>
 
                 {/* Impact & Benchmarks Sidebar */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingLeft: '2rem', borderLeft: '1px solid var(--border-color)' }}>
+                <div className="explanation-sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingLeft: '2rem', borderLeft: '1px solid var(--border-color)' }}>
 
                     <div>
                         <h5 style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '1rem', letterSpacing: '0.1em' }}>Audit Scorecard</h5>
@@ -106,8 +106,18 @@ const ExplanationPanel = ({ mistake }) => {
                         Deep Dive Docs <ExternalLink size={14} />
                     </button>
                 </div>
-
             </div>
+
+            <style>{`
+                @media (max-width: 1024px) {
+                    .explanation-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+                    .explanation-sidebar { border-left: none !important; padding-left: 0 !important; border-top: 1px solid var(--border-color); padding-top: 2rem !important; }
+                }
+                @media (max-width: 768px) {
+                    .explanation-container { padding: 1.5rem !important; }
+                    .audit-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+                }
+            `}</style>
         </motion.div>
     );
 };

@@ -67,7 +67,7 @@ const PreviewFrame = ({ mistakeId, isFixed }) => {
             case 'css-aspect-ratio':
                 return (
                     <div style={{ width: '100%', padding: '20px' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div className="preview-aspect-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                             <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative' }}>
                                 <img
                                     src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
@@ -193,3 +193,15 @@ const HeavyFilter = ({ isFixed }) => {
 };
 
 export default PreviewFrame;
+
+const styles = `
+    @media (max-width: 600px) {
+        .preview-aspect-grid { grid-template-columns: 1fr !important; }
+    }
+`;
+
+if (typeof document !== 'undefined') {
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = styles;
+    document.head.appendChild(styleSheet);
+}
