@@ -7,10 +7,21 @@ import {
 } from 'lucide-react';
 import PreviewFrame from './PreviewFrame';
 
-const SimulatorLayout = ({ mistake, isFixed, toggleFix, viewMode }) => {
+const SimulatorLayout = ({ mistake, isFixed, toggleFix, viewMode, soundEnabled }) => {
     const [deploying, setDeploying] = useState(false);
     const [deployStatus, setDeployStatus] = useState(null); // 'success', 'fail'
     const [terminalLogs, setTerminalLogs] = useState([]);
+
+    const playSound = (type) => {
+        if (!soundEnabled) return;
+        const sounds = {
+            success: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3', // Chime
+            error: 'https://assets.mixkit.co/active_storage/sfx/2014/2014-preview.mp3' // Glitch
+        };
+        const audio = new Audio(sounds[type]);
+        audio.volume = 0.3;
+        audio.play().catch(e => console.log('Audio play blocked'));
+    };
 
     // Simulate logs when toggling
     useEffect(() => {
@@ -25,7 +36,9 @@ const SimulatorLayout = ({ mistake, isFixed, toggleFix, viewMode }) => {
         setDeployStatus(null);
         setTimeout(() => {
             setDeploying(false);
-            setDeployStatus(isFixed ? 'success' : 'fail');
+            const status = isFixed ? 'success' : 'fail';
+            setDeployStatus(status);
+            playSound(status === 'success' ? 'success' : 'error');
         }, 2000);
     };
 

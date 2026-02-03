@@ -9,6 +9,9 @@ export const useSimulatorState = () => {
     const [score, setScore] = useState(() => parseInt(localStorage.getItem('sim_score')) || 0);
     const [theme, setTheme] = useState(() => localStorage.getItem('sim_theme') || 'midnight');
     const [xp, setXp] = useState(() => parseInt(localStorage.getItem('sim_xp')) || 0);
+    const [apiKey, setApiKey] = useState(() => localStorage.getItem('sim_apiKey') || '');
+    const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('sim_soundEnabled') !== 'false'); // Default true
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const level = Math.floor(xp / 500) + 1;
     const selectedMistake = MISTAKES.find(m => m.id === selectedId) || MISTAKES[0];
@@ -24,7 +27,9 @@ export const useSimulatorState = () => {
         localStorage.setItem('sim_score', score.toString());
         localStorage.setItem('sim_theme', theme);
         localStorage.setItem('sim_xp', xp.toString());
-    }, [mainView, selectedId, score, theme, xp]);
+        localStorage.setItem('sim_apiKey', apiKey);
+        localStorage.setItem('sim_soundEnabled', soundEnabled.toString());
+    }, [mainView, selectedId, score, theme, xp, apiKey, soundEnabled]);
 
     const selectMistake = useCallback((id) => {
         setSelectedId(id);
@@ -57,6 +62,12 @@ export const useSimulatorState = () => {
         selectMistake,
         toggleFix,
         setView,
+        apiKey,
+        setApiKey,
+        soundEnabled,
+        setSoundEnabled,
+        isSettingsOpen,
+        setIsSettingsOpen,
         mistakes: MISTAKES
     };
 };

@@ -1,4 +1,3 @@
-import React from 'react';
 import Header from './components/Header';
 import MistakeSelector from './components/MistakeSelector';
 import SimulatorLayout from './components/SimulatorLayout';
@@ -8,6 +7,9 @@ import ChallengeMode from './components/ChallengeMode';
 import LivePlayground from './components/LivePlayground';
 import Documentation from './components/Documentation';
 import CodeAnalyzer from './components/CodeAnalyzer';
+import SettingsModal from './components/SettingsModal';
+import AIAssistant from './components/AIAssistant';
+import ProgressDashboard from './components/ProgressDashboard';
 import { useSimulatorState } from './hooks/useSimulatorState';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -27,6 +29,12 @@ function App() {
     selectMistake,
     toggleFix,
     setView,
+    apiKey,
+    setApiKey,
+    soundEnabled,
+    setSoundEnabled,
+    isSettingsOpen,
+    setIsSettingsOpen,
     mistakes
   } = useSimulatorState();
 
@@ -40,6 +48,8 @@ function App() {
         return <ChallengeMode key="challenge-view" mistakes={mistakes} onAddXp={addXp} />;
       case 'playground':
         return <LivePlayground key="playground-view" mistake={selectedMistake} />;
+      case 'progress':
+        return <ProgressDashboard key="progress-view" xp={xp} level={level} />;
       default:
         return (
           <div className="simulator-grid" key="simulator-main">
@@ -57,6 +67,7 @@ function App() {
                 isFixed={isFixed}
                 toggleFix={toggleFix}
                 viewMode={viewMode}
+                soundEnabled={soundEnabled}
               />
 
               <ExplanationPanel mistake={selectedMistake} />
@@ -75,6 +86,16 @@ function App() {
         level={level}
         theme={theme}
         setTheme={setTheme}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        apiKey={apiKey}
+        setApiKey={setApiKey}
+        soundEnabled={soundEnabled}
+        setSoundEnabled={setSoundEnabled}
       />
 
       <main style={{
@@ -126,13 +147,18 @@ function App() {
         fontSize: '0.85rem',
         background: 'rgba(0,0,0,0.2)'
       }}>
-        <p>Built with ❤️ for the Developer Community. Learn, Verify, and Ship Clean Code.</p>
+        <p>Built for the Developer Community. Learn, Verify, and Ship Clean Code.</p>
         <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           <span style={{ color: 'var(--accent-primary)' }}>#ReactJS</span>
           <span style={{ color: 'var(--accent-secondary)' }}>#CSSGrid</span>
           <span style={{ color: 'var(--color-success)' }}>#WebDev</span>
         </div>
       </footer>
+
+      <AIAssistant
+        apiKey={apiKey}
+        currentMistake={selectedMistake}
+      />
 
       <style dangerouslySetInnerHTML={{
         __html: `

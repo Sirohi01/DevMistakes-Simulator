@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import {
     Bug, FileText, Search, Menu, X, Layers,
     Trophy, Terminal, Activity, Bell, Settings,
-    Sun, Moon, Palette, ShieldCheck, Zap as ZapIcon
+    Sun, Moon, Palette, ShieldCheck, Zap as ZapIcon, TrendingUp
 } from 'lucide-react';
 
-const Header = ({ currentView, onViewChange, xp, level, theme, setTheme }) => {
+const Header = ({ currentView, onViewChange, xp, level, theme, setTheme, onOpenSettings }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const THEMES = [
@@ -60,7 +60,7 @@ const Header = ({ currentView, onViewChange, xp, level, theme, setTheme }) => {
                     </h1>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-success)' }} />
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-dim)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>v2.0 Immersive Suite</span>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-dim)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>v3.0 Pro Suite</span>
                     </div>
                 </div>
             </div>
@@ -71,6 +71,7 @@ const Header = ({ currentView, onViewChange, xp, level, theme, setTheme }) => {
                 <NavItem view="challenge" label="Challenges" icon={Trophy} />
                 <NavItem view="playground" label="Lab" icon={Terminal} />
                 <NavItem view="analyzer" label="Auditor" icon={Search} />
+                {/* <NavItem view="progress" label="Progress" icon={TrendingUp} /> */}
                 <NavItem view="docs" label="Masterclass" icon={FileText} />
             </nav>
 
@@ -111,6 +112,23 @@ const Header = ({ currentView, onViewChange, xp, level, theme, setTheme }) => {
                         <ShieldCheck size={18} className="text-accent" />
                     </div>
                 </div>
+
+                <button
+                    onClick={onOpenSettings}
+                    style={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        padding: '8px',
+                        borderRadius: '10px',
+                        color: 'var(--text-dim)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        transition: 'all 0.2s'
+                    }}
+                    title="Settings"
+                >
+                    <Settings size={18} />
+                </button>
             </div>
 
             <div className="mobile-toggle" style={{ display: 'none' }}>
@@ -130,6 +148,7 @@ const Header = ({ currentView, onViewChange, xp, level, theme, setTheme }) => {
                         <NavItem view="challenge" label="Challenges" icon={Trophy} />
                         <NavItem view="playground" label="Lab" icon={Terminal} />
                         <NavItem view="analyzer" label="Auditor" icon={Search} />
+                        {/* <NavItem view="progress" label="Progress" icon={TrendingUp} /> */}
                         <NavItem view="docs" label="Masterclass" icon={FileText} />
                     </div>
 
@@ -173,6 +192,32 @@ const Header = ({ currentView, onViewChange, xp, level, theme, setTheme }) => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Mobile Settings Button */}
+                    <button
+                        onClick={() => {
+                            setIsMenuOpen(false);
+                            onOpenSettings();
+                        }}
+                        style={{
+                            width: '100%',
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--border-color)',
+                            padding: '12px',
+                            borderRadius: '12px',
+                            color: 'var(--text-main)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            fontWeight: 600,
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        <Settings size={18} />
+                        Settings
+                    </button>
                 </div>
             )}
 
