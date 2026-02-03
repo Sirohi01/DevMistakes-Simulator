@@ -148,16 +148,42 @@ const Documentation = () => {
     };
 
     return (
-        <div className="docs-layout" style={{ display: 'flex', gap: '2rem', maxWidth: '1400px', margin: '0 auto', padding: '0 1rem 4rem 1rem', minHeight: '80vh' }}>
+        <div className="docs-layout" style={{ display: 'flex', gap: '2rem', maxWidth: '1400px', margin: '0 auto', padding: '0 1rem 4rem 1rem', minHeight: '80vh', position: 'relative' }}>
+            {/* Mobile Menu Toggle */}
+            <button
+                className="mobile-docs-toggle"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                style={{
+                    display: 'none', // Hidden by default, shown in CSS
+                    position: 'fixed',
+                    bottom: '20px',
+                    left: '20px', // Moved to left to avoid AI Assistant overlap
+                    zIndex: 100,
+                    background: 'var(--accent-primary)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '50px',
+                    height: '50px',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)'
+                }}
+            >
+                {isMobileMenuOpen ? <ChevronRight size={24} /> : <Menu size={24} />}
+            </button>
+
             {/* Sidebar */}
-            <div className="docs-sidebar glass" style={{
+            <div className={`docs-sidebar glass ${isMobileMenuOpen ? 'open' : ''}`} style={{
                 width: '300px',
                 padding: '1.5rem',
                 borderRadius: '16px',
                 height: 'fit-content',
                 position: 'sticky',
                 top: '100px', // Adjusted for Header
-                alignSelf: 'start'
+                alignSelf: 'start',
+                maxHeight: 'calc(100vh - 120px)',
+                overflowY: 'auto'
             }}>
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <BookOpen size={20} className="text-accent" /> Documentation
@@ -166,14 +192,18 @@ const Documentation = () => {
                     {sections.map(sec => (
                         <button
                             key={sec.id}
-                            onClick={() => setActiveSection(sec.id)}
+                            onClick={() => {
+                                setActiveSection(sec.id);
+                                setIsMobileMenuOpen(false); // Auto-close on mobile
+                            }}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '12px',
                                 padding: '12px', borderRadius: '10px',
                                 background: activeSection === sec.id ? 'var(--accent-primary)' : 'transparent',
                                 color: activeSection === sec.id ? 'white' : 'var(--text-dim)',
                                 border: 'none', cursor: 'pointer', textAlign: 'left',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                width: '100%'
                             }}
                         >
                             <sec.icon size={18} />
@@ -208,16 +238,23 @@ const Documentation = () => {
 
             <style dangerouslySetInnerHTML={{
                 __html: `
-                .doc-content h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem; color: white; }
+                .doc-content h1 { font-size: clamp(2rem, 5vw, 2.5rem); font-weight: 900; margin-bottom: 1rem; color: white; line-height: 1.2; }
+                .doc-content .lead { font-size: 1.2rem; color: var(--text-dim); margin-bottom: 2rem; max-width: 800px; }
                 .doc-content h3 { font-size: 1.5rem; font-weight: 700; margin: 2rem 0 1rem 0; color: var(--accent-secondary); }
                 .doc-content p { color: var(--text-muted); line-height: 1.7; font-size: 1.05rem; margin-bottom: 1rem; }
                 .doc-content ul, .doc-content ol { padding-left: 1.5rem; color: var(--text-muted); margin-bottom: 1.5rem; }
                 .doc-content li { margin-bottom: 0.5rem; line-height: 1.6; }
                 .doc-content strong { color: white; }
                 
-                .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 2rem; }
-                .feature-card { background: rgba(255,255,255,0.05); padding: 1.5rem; borderRadius: 12px; border: 1px solid var(--border-color); }
-                .feature-card h3 { margin-top: 0; font-size: 1.1rem; color: white; }
+                .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 2rem; }
+                
+                @media (max-width: 600px) {
+                    .feature-grid { grid-template-columns: 1fr; }
+                    .docs-layout { padding: 0 1rem 6rem 1rem !important; }
+                }
+
+                .feature-card { background: rgba(255,255,255,0.05); padding: 1.5rem; borderRadius: 16px; border: 1px solid var(--border-color); }
+                .feature-card h3 { margin-top: 0; font-size: 1.3rem; color: white; margin-bottom: 0.8rem; }
                 .feature-card p { font-size: 0.9rem; margin-bottom: 0; }
 
                 .info-box { background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--accent-primary); padding: 1rem; border-radius: 8px; margin: 1.5rem 0; }
@@ -226,11 +263,69 @@ const Documentation = () => {
                 .project-item h4 { color: white; font-size: 1.2rem; margin-bottom: 0.5rem; }
                 
                 @media (max-width: 900px) {
-                    .docs-layout { flexDirection: column; padding: 0 1rem; }
-                    .docs-sidebar { width: 100%; position: relative; top: 0; margin-bottom: 1rem; }
-                    .docs-main { padding: 1.5rem; }
+                    .docs-layout { flexDirection: column; padding: 0 1rem 5rem 1rem; }
+                    .mobile-docs-toggle { display: flex !important; }
+                    
+                    /* Typography Adjustments */
+                    .doc-content h1 { font-size: 1.8rem !important; margin-top: 0; }
+                    .doc-content p.lead { font-size: 1rem !important; }
+                    .doc-content h3 { font-size: 1.3rem !important; margin-top: 1.5rem !important; }
+                    
+                    /* Sidebar Styling */
+                    .docs-sidebar {
+                        position: fixed !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        height: 100vh !important;
+                        width: 280px !important;
+                        z-index: 90;
+                        background: #0f172a !important;
+                        transform: translateX(-100%);
+                        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        margin: 0 !important;
+                        border-radius: 0 !important;
+                        border-right: 1px solid var(--border-color);
+                        box-shadow: none;
+                    }
+                    
+                    .docs-sidebar.open {
+                        transform: translateX(0);
+                        box-shadow: 10px 0 50px rgba(0,0,0,0.5);
+                    }
+
+                    .docs-main { 
+                        padding: 1.5rem !important; 
+                        width: 100%;
+                        border-radius: 12px;
+                    }
+                    
+                    /* Overlay */
+                    .docs-layout::before {
+                        content: '';
+                        position: fixed;
+                        inset: 0;
+                        background: rgba(0,0,0,0.7);
+                        backdrop-filter: blur(4px);
+                        z-index: 80;
+                        opacity: 0;
+                        pointer-events: none;
+                        transition: opacity 0.3s;
+                    }
+                }
+                
+                body.menu-open .docs-layout::before {
+                    opacity: 1;
+                    pointer-events: all;
                 }
             `}} />
+
+            {/* Overlay Click Handler */}
+            {isMobileMenuOpen && (
+                <div
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{ position: 'fixed', inset: 0, zIndex: 85 }}
+                />
+            )}
         </div>
     );
 };
