@@ -538,6 +538,32 @@ export default function TodoApp() {
                     }
                 }
             `}} />
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                @media (max-width: 600px) {
+                    .glass {
+                        width: 100% !important;
+                        height: 100% !important;
+                        border-radius: 0 !important;
+                    }
+                    .editor-toolbar {
+                        padding: 0.75rem !important;
+                        flex-direction: column;
+                        align-items: flex-start !important;
+                        gap: 12px !important;
+                    }
+                    .editor-actions {
+                        width: 100%;
+                        justify-content: space-between;
+                    }
+                    .editor-actions button {
+                        flex: 1;
+                        justify-content: center;
+                        padding: 10px !important;
+                    }
+                    .hide-mobile { display: none !important; }
+                }
+            `}} />
             {/* Code Editor Modal */}
             <AnimatePresence>
                 {fixingBug && (
@@ -578,19 +604,23 @@ export default function TodoApp() {
                             }}
                         >
                             {/* Toolbar */}
-                            <div style={{
+                            <div className="editor-toolbar" style={{
                                 padding: '1rem',
                                 borderBottom: '1px solid var(--border-color)',
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                background: 'rgba(255,255,255,0.03)'
+                                background: 'rgba(255,255,255,0.03)',
+                                flexWrap: 'wrap',
+                                gap: '10px'
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '200px' }}>
                                     <Code2 size={20} className="text-accent" />
-                                    <span style={{ fontWeight: 700 }}>Fixing: {bugs.find(b => b.id === fixingBug)?.title}</span>
+                                    <span style={{ fontWeight: 700, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                        Fixing: {bugs.find(b => b.id === fixingBug)?.title}
+                                    </span>
                                 </div>
-                                <div style={{ display: 'flex', gap: '10px' }}>
+                                <div className="editor-actions" style={{ display: 'flex', gap: '10px' }}>
                                     <button
                                         onClick={() => setCodeContent(BUGGY_CODE)}
                                         style={{
@@ -604,9 +634,10 @@ export default function TodoApp() {
                                             alignItems: 'center',
                                             gap: '6px'
                                         }}
+                                        title="Reset Code"
                                     >
                                         <RefreshCcw size={14} />
-                                        Reset
+                                        <span className="hide-mobile">Reset</span>
                                     </button>
                                     <button
                                         onClick={() => setFixingBug(null)}
@@ -633,7 +664,8 @@ export default function TodoApp() {
                                             cursor: 'pointer',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '8px'
+                                            gap: '8px',
+                                            whiteSpace: 'nowrap'
                                         }}
                                     >
                                         {fixSuccess ? <Check size={18} /> : <Play size={18} />}
@@ -643,7 +675,7 @@ export default function TodoApp() {
                             </div>
 
                             {/* Editor Area */}
-                            <div style={{ flex: 1, position: 'relative' }}>
+                            <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
                                 {fixSuccess && (
                                     <motion.div
                                         initial={{ opacity: 0 }}

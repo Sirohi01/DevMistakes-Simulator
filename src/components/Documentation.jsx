@@ -154,10 +154,10 @@ const Documentation = () => {
                 className="mobile-docs-toggle"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 style={{
-                    display: 'none', // Hidden by default, shown in CSS
+                    display: 'none',
                     position: 'fixed',
                     bottom: '20px',
-                    left: '20px', // Moved to left to avoid AI Assistant overlap
+                    left: '20px',
                     zIndex: 100,
                     background: 'var(--accent-primary)',
                     color: 'white',
