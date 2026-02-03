@@ -88,7 +88,7 @@ const ProjectMode = ({ onSelectProject, completedProjects = [] }) => {
                 gap: '2rem',
                 maxWidth: '1200px',
                 margin: '0 auto'
-            }}>
+            }} className="projects-grid">
                 {projects.map((project, idx) => {
                     const isCompleted = completedProjects.includes(project.id);
                     const isLocked = !project.unlocked;

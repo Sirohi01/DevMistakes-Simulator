@@ -174,3 +174,19 @@ body {
 #root {
   width: 100%;
 }
+
+/* God Mode - Visual Debugger */
+body.debug-mode * {
+  outline: 1px solid rgba(99, 102, 241, 0.25) !important;
+}
+
+body.debug-mode *:hover {
+  outline: 1px solid rgba(99, 102, 241, 0.8) !important;
+  background: rgba(99, 102, 241, 0.05);
+  cursor: crosshair;
+}
+
+body.debug-mode .glass {
+    backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+}

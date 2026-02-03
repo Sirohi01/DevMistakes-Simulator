@@ -115,6 +115,31 @@ const Header = ({ currentView, onViewChange, xp, level, theme, setTheme, onOpenS
                 </div>
 
                 <button
+                    onClick={() => {
+                        document.body.classList.toggle('debug-mode');
+                        // Force re-render icon state
+                        const isDebug = document.body.classList.contains('debug-mode');
+                        // Simple way to trigger visual feedback - in real app would use state
+                        if (isDebug) {
+                            // play sound if available
+                        }
+                    }}
+                    style={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        padding: '8px',
+                        borderRadius: '10px',
+                        color: 'var(--accent-secondary)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        transition: 'all 0.2s'
+                    }}
+                    title="Toggle God Mode (Visual Debugger)"
+                >
+                    <Activity size={18} />
+                </button>
+
+                <button
                     onClick={onOpenSettings}
                     style={{
                         background: 'var(--bg-card)',
