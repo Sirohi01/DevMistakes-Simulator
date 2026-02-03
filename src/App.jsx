@@ -1,3 +1,4 @@
+import React from 'react';
 import Header from './components/Header';
 import MistakeSelector from './components/MistakeSelector';
 import SimulatorLayout from './components/SimulatorLayout';
@@ -10,6 +11,10 @@ import CodeAnalyzer from './components/CodeAnalyzer';
 import SettingsModal from './components/SettingsModal';
 import AIAssistant from './components/AIAssistant';
 import ProgressDashboard from './components/ProgressDashboard';
+import ProjectMode from './components/ProjectMode';
+import TodoProject from './components/projects/TodoProject';
+import CartProject from './components/projects/CartProject';
+import DashboardProject from './components/projects/DashboardProject';
 import { useSimulatorState } from './hooks/useSimulatorState';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -38,6 +43,23 @@ function App() {
     mistakes
   } = useSimulatorState();
 
+  const [selectedProject, setSelectedProject] = React.useState(null);
+  const [completedProjects, setCompletedProjects] = React.useState([]);
+
+  const handleProjectSelect = (project) => {
+    setSelectedProject(project);
+    setMainView('project-debug');
+  };
+
+  const handleProjectComplete = (result) => {
+    if (result.perfectScore && selectedProject) {
+      setCompletedProjects([...completedProjects, selectedProject.id]);
+      addXp(result.xpEarned);
+    }
+    setSelectedProject(null);
+    setMainView('projects');
+  };
+
   const renderContent = () => {
     switch (mainView) {
       case 'docs':
@@ -50,6 +72,35 @@ function App() {
         return <LivePlayground key="playground-view" mistake={selectedMistake} />;
       case 'progress':
         return <ProgressDashboard key="progress-view" xp={xp} level={level} />;
+      case 'projects':
+        return <ProjectMode
+          key="projects-view"
+          onSelectProject={handleProjectSelect}
+          completedProjects={completedProjects}
+        />;
+      case 'project-debug':
+        if (selectedProject?.id === 'todo-bugs') {
+          return <TodoProject
+            key="todo-project"
+            onComplete={handleProjectComplete}
+            onBack={() => setMainView('projects')}
+          />;
+        }
+        if (selectedProject?.id === 'cart-issues') {
+          return <CartProject
+            key="cart-project"
+            onComplete={handleProjectComplete}
+            onBack={() => setMainView('projects')}
+          />;
+        }
+        if (selectedProject?.id === 'dashboard-perf') {
+          return <DashboardProject
+            key="dashboard-project"
+            onComplete={handleProjectComplete}
+            onBack={() => setMainView('projects')}
+          />;
+        }
+        return <ProjectMode onSelectProject={handleProjectSelect} completedProjects={completedProjects} />;
       default:
         return (
           <div className="simulator-grid" key="simulator-main">

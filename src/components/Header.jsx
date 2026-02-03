@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
     Bug, FileText, Search, Menu, X, Layers,
     Trophy, Terminal, Activity, Bell, Settings,
-    Sun, Moon, Palette, ShieldCheck, Zap as ZapIcon, TrendingUp
+    Sun, Moon, Palette, ShieldCheck, Zap as ZapIcon, TrendingUp, Rocket
 } from 'lucide-react';
 
 const Header = ({ currentView, onViewChange, xp, level, theme, setTheme, onOpenSettings }) => {
@@ -66,11 +66,12 @@ const Header = ({ currentView, onViewChange, xp, level, theme, setTheme, onOpenS
             </div>
 
             {/* Main Nav */}
-            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <NavItem view="simulator" label="Workbench" icon={Layers} />
                 <NavItem view="challenge" label="Challenges" icon={Trophy} />
                 <NavItem view="playground" label="Lab" icon={Terminal} />
                 <NavItem view="analyzer" label="Auditor" icon={Search} />
+                <NavItem view="projects" label="Projects" icon={Rocket} />
                 {/* <NavItem view="progress" label="Progress" icon={TrendingUp} /> */}
                 <NavItem view="docs" label="Masterclass" icon={FileText} />
             </nav>
@@ -148,6 +149,7 @@ const Header = ({ currentView, onViewChange, xp, level, theme, setTheme, onOpenS
                         <NavItem view="challenge" label="Challenges" icon={Trophy} />
                         <NavItem view="playground" label="Lab" icon={Terminal} />
                         <NavItem view="analyzer" label="Auditor" icon={Search} />
+                        <NavItem view="projects" label="Projects" icon={Rocket} />
                         {/* <NavItem view="progress" label="Progress" icon={TrendingUp} /> */}
                         <NavItem view="docs" label="Masterclass" icon={FileText} />
                     </div>
