@@ -7,7 +7,7 @@ const StatusMetric = ({ label, value, color = 'var(--text-muted)' }) => (
     </div>
 );
 
-const GlobalHUD = ({ isFixed }) => {
+const GlobalHUD = ({ isFixed, onViewChange }) => {
     return (
         <div className="animate-slide-up global-hud" style={{
             display: 'flex', gap: '1.5rem', marginBottom: '2.5rem',
@@ -25,6 +25,22 @@ const GlobalHUD = ({ isFixed }) => {
                 <StatusMetric label="Security Flaws" value={isFixed ? '0' : '2'} color={isFixed ? 'white' : 'var(--color-error)'} />
                 <StatusMetric label="Render Latency" value={isFixed ? '14ms' : '142ms'} color={isFixed ? 'var(--color-success)' : 'var(--color-error)'} />
             </div>
+            <div style={{ flex: 1 }} />
+            <button
+                onClick={() => onViewChange && onViewChange('desktop')}
+                style={{
+                    background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+                }}
+            >
+                Launch DevOS 🖥️
+            </button>
         </div>
     );
 };

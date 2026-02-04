@@ -13,6 +13,8 @@ import TodoProject from '../projects/TodoProject';
 import CartProject from '../projects/CartProject';
 import DashboardProject from '../projects/DashboardProject';
 
+import Desktop from '../os/Desktop';
+
 const ViewManager = ({
     mainView,
     setMainView,
@@ -30,18 +32,25 @@ const ViewManager = ({
     selectedProject,
     handleProjectSelect,
     completedProjects,
-    handleProjectComplete
+    handleProjectComplete,
+    chaos,
+    apiKey
 }) => {
 
     switch (mainView) {
+        case 'desktop':
+            return <Desktop simulatorState={{
+                mainView, setMainView, selectedMistake, mistakes, selectMistake,
+                isFixed, toggleFix, viewMode, setView, soundEnabled, xp, level, addXp, chaos, apiKey
+            }} />;
         case 'docs':
             return <Documentation key="docs-view" />;
         case 'analyzer':
-            return <CodeAnalyzer key="analyzer-view" onAddXp={addXp} />;
+            return <CodeAnalyzer key="analyzer-view" onAddXp={addXp} apiKey={apiKey} />;
         case 'challenge':
             return <ChallengeMode key="challenge-view" mistakes={mistakes} onAddXp={addXp} />;
         case 'playground':
-            return <LivePlayground key="playground-view" mistake={selectedMistake} />;
+            return <LivePlayground key="playground-view" mistake={selectedMistake} apiKey={apiKey} />;
         case 'progress':
             return <ProgressDashboard key="progress-view" xp={xp} level={level} />;
         case 'projects':

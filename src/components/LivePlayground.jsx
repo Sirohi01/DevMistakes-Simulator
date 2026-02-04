@@ -5,11 +5,30 @@ import {
     Box, Cpu, Globe, Terminal as TerminalIcon
 } from 'lucide-react';
 
-const LivePlayground = ({ mistake }) => {
+import { generateAIContent } from '../services/aiService';
+import { useTimeTravel } from '../hooks/useTimeTravel';
+
+const LivePlayground = ({ mistake, apiKey }) => {
     const [framework, setFramework] = useState('React');
-    const [code, setCode] = useState('');
+    const { currentState: code, updateState: setCode, history, currentIndex, goToIndex } = useTimeTravel('');
     const [status, setStatus] = useState('idle');
     const [feedback, setFeedback] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const generateChallenge = async () => {
+        if (!apiKey) return;
+        setIsGenerating(true);
+        try {
+            const prompt = `Generate a short but tricky ${framework} coding interview challenge component that contains a subtle bug (mutation, stale closure, or rendering issue). 
+            Return ONLY the code block (no markdown text). Include comments explaining the goal but NOT the fix.`;
+
+            const aiCode = await generateAIContent(apiKey, prompt);
+            setCode(aiCode.replace(/```javascript|```/g, '').trim());
+        } catch (e) {
+            console.error("Failed to generate", e);
+        }
+        setIsGenerating(false);
+    };
 
     const getFrameworkCode = (fw) => {
         if (fw === 'Vue') return `// Vue 3 Composition API\n<script setup>\nconst state = reactive({ data: [] });\n\n// Mutation Bug: \nconst add = () => {\n  state.data.push(item);\n};\n</script>`;
@@ -77,9 +96,21 @@ const LivePlayground = ({ mistake }) => {
                             <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#27c93f' }} />
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginLeft: '12px', fontFamily: 'var(--font-mono)' }}>playground.{framework.toLowerCase()}</span>
                         </div>
-                        <button onClick={() => setCode(getFrameworkCode(framework))} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <RefreshCw size={12} /> Reset Source
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            {apiKey && (
+                                <button
+                                    onClick={generateChallenge}
+                                    disabled={isGenerating}
+                                    style={{ fontSize: '0.75rem', color: isGenerating ? 'var(--text-dim)' : 'var(--accent-primary)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}
+                                >
+                                    {isGenerating ? <RefreshCw className="animate-spin" size={12} /> : <Zap size={12} />}
+                                    {isGenerating ? 'Generating...' : 'Endless Challenge'}
+                                </button>
+                            )}
+                            <button onClick={() => setCode(getFrameworkCode(framework))} style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <RefreshCw size={12} /> Reset Source
+                            </button>
+                        </div>
                     </div>
 
                     <textarea
@@ -93,18 +124,31 @@ const LivePlayground = ({ mistake }) => {
                         }}
                     />
 
-                    <div style={{ padding: '1.5rem', background: 'rgba(5, 6, 15, 0.5)', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end' }}>
+                    <div style={{ padding: '0.75rem 1.5rem', background: 'rgba(5, 6, 15, 0.5)', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {/* Time Travel Controls */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, marginRight: '2rem' }}>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: 700, textTransform: 'uppercase' }}>Time Travel ({currentIndex}/{history.length - 1})</span>
+                            <input
+                                type="range"
+                                min="0"
+                                max={history.length - 1}
+                                value={currentIndex}
+                                onChange={(e) => goToIndex(Number(e.target.value))}
+                                style={{ flex: 1, accentColor: 'var(--accent-primary)', height: '4px' }}
+                            />
+                        </div>
+
                         <button
                             onClick={runCode}
                             disabled={status === 'testing'}
                             style={{
-                                background: 'white', color: 'black', padding: '12px 32px', borderRadius: '12px',
-                                fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer',
-                                transition: 'all 0.2s ease', border: 'none'
+                                background: 'white', color: 'black', padding: '10px 24px', borderRadius: '10px',
+                                fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer',
+                                transition: 'all 0.2s ease', border: 'none', fontSize: '0.85rem'
                             }}
                         >
-                            {status === 'testing' ? <RefreshCw className="animate-spin" size={18} /> : <Play size={18} fill="black" />}
-                            Execute Runtime
+                            {status === 'testing' ? <RefreshCw className="animate-spin" size={16} /> : <Play size={16} fill="black" />}
+                            Execute
                         </button>
                     </div>
                 </div>
@@ -172,7 +216,7 @@ const LivePlayground = ({ mistake }) => {
                     .playground-header { flex-direction: column; align-items: flex-start !important; }
                 }
             `}</style>
-        </div>
+        </div >
     );
 };
 

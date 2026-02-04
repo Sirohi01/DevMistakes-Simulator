@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Search, ShieldAlert, CheckCircle, Sparkles, Award, Zap, AlertTriangle, TrendingUp, Cpu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const CodeAnalyzer = ({ onAddXp }) => {
+import { generateAIContent } from '../services/aiService';
+
+const CodeAnalyzer = ({ onAddXp, apiKey }) => {
     const [code, setCode] = useState('');
     const [results, setResults] = useState(null);
     const [isScanning, setIsScanning] = useState(false);
@@ -19,10 +21,35 @@ const CodeAnalyzer = ({ onAddXp }) => {
         "ChatGPT se likhwaya hai na? Sach batana."
     ];
 
-    const analyzeCode = () => {
+    const analyzeCode = async () => {
         setIsScanning(true);
         setResults(null);
-        if (onAddXp) onAddXp(50); // XP for using the auditor
+        if (onAddXp) onAddXp(50);
+
+        // REAL AI PATH
+        if (apiKey && apiKey.length > 20) {
+            try {
+                const prompt = `You are a strict React Code Auditor. Analyze this code for security, performance, and patterns. 
+                Return a JSON ARRAY of issues (objects with: type='error'|'warning', title, message, fix, impact='High'|'Med'|'Low'). 
+                If roastMode is ${roastMode}, be sarcastic in messages.
+                Return ONLY JSON. No markdown. Code: \n\n${code}`;
+
+                const response = await generateAIContent(apiKey, prompt);
+                const jsonStr = response.replace(/```json|```/g, '').trim();
+                const issues = JSON.parse(jsonStr);
+
+                // Calculate Score
+                let aiScore = 100;
+                issues.forEach(i => aiScore -= (i.impact === 'High' ? 15 : 5));
+                setScore(Math.max(0, aiScore));
+                setResults(issues);
+                setIsScanning(false);
+                return;
+            } catch (err) {
+                console.error("AI Audit failed, falling back to static", err);
+                // Fallthrough to static
+            }
+        }
 
         setTimeout(() => {
             const foundIssues = [];

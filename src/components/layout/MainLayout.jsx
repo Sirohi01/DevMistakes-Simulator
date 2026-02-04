@@ -26,17 +26,21 @@ const MainLayout = ({
         setIsSettingsOpen
     } = simulatorState;
 
+    const isDesktop = mainView === 'desktop';
+
     return (
         <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-page)' }}>
-            <Header
-                currentView={mainView}
-                onViewChange={setMainView}
-                xp={xp}
-                level={level}
-                theme={theme}
-                setTheme={setTheme}
-                onOpenSettings={() => setIsSettingsOpen(true)}
-            />
+            {!isDesktop && (
+                <Header
+                    currentView={mainView}
+                    onViewChange={setMainView}
+                    xp={xp}
+                    level={level}
+                    theme={theme}
+                    setTheme={setTheme}
+                    onOpenSettings={() => setIsSettingsOpen(true)}
+                />
+            )}
 
             <SettingsModal
                 isOpen={isSettingsOpen}
@@ -48,19 +52,19 @@ const MainLayout = ({
             />
 
             <main style={{
-                maxWidth: '1440px',
+                maxWidth: isDesktop ? '100%' : '1440px',
                 margin: '0 auto',
                 width: '100%',
-                padding: '0 var(--main-padding) var(--main-padding)',
+                padding: isDesktop ? 0 : '0 var(--main-padding) var(--main-padding)',
                 flex: 1
             }}>
                 {/* Global Hub - Command Center Status */}
-                {mainView === 'simulator' && <GlobalHUD isFixed={isFixed} />}
+                {!isDesktop && mainView === 'simulator' && <GlobalHUD isFixed={isFixed} onViewChange={setMainView} />}
 
                 {children}
             </main>
 
-            <AppFooter />
+            {!isDesktop && <AppFooter />}
 
             <AIAssistant
                 apiKey={apiKey}
